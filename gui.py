@@ -31,7 +31,7 @@ class AppUX():
 
     def get_trasks(self):
         # add single id for each trasks
-        self.generate_single_id
+        self.generate_single_id()
         return self.all_trasks
 
     def clear_trasks(self):
@@ -56,9 +56,9 @@ class AppUX():
         elif(dest == 'other_container'):
             new_type = 'other'
         
-        """ for t in self.all_trasks:
+        for t in self.all_trasks:
             if(t.single_id == trask_id):
-                t.modify_type(new_type) """
+                t.modify_type(new_type)
 
 
 # global

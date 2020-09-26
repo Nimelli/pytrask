@@ -16,7 +16,7 @@ def PrintNumber(N, Original, K, flag):
 
     """
     @trask
-    todo:  implement comment block integration
+    doing:  implement comment block integration
             because it is useful for multiline integration
     author: me
     """

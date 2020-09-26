@@ -61,12 +61,12 @@ class Trask():
         print('tags: {}'.format(self.tags))
 
     def modify_type(self, new_type):
+        print("Modifing trask type")
         if(new_type == self.trask_type):
             return
 
         to_change = self.trask_type + ':'
         to_change_by = new_type + ':'
-
 
         # open file and copy content
         with open(self.in_file, 'r') as in_file:
@@ -79,6 +79,7 @@ class Trask():
                     old_line = line
                     new_line = old_line.replace(to_change, to_change_by)
                     content[line_nb] = new_line
+                    break
 
         # write new content
         with open(self.in_file, 'w') as out_file:
