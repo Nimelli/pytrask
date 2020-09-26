@@ -60,6 +60,32 @@ class Trask():
         print('description: {}'.format(self.description))
         print('tags: {}'.format(self.tags))
 
+    def modify_type(self, new_type):
+        if(new_type == self.trask_type):
+            return
+
+        to_change = self.trask_type + ':'
+        to_change_by = new_type + ':'
+
+
+        # open file and copy content
+        with open(self.in_file, 'r') as in_file:
+            content = in_file.readlines()
+
+        for line_nb, line in enumerate(content):
+            if(line_nb+1 > self.at_line):
+                if(to_change in line):
+                    # we found the line to change
+                    old_line = line
+                    new_line = old_line.replace(to_change, to_change_by)
+                    content[line_nb] = new_line
+
+        # write new content
+        with open(self.in_file, 'w') as out_file:
+            out_file.writelines(content)
+
+        self.trask_type = new_type
+
 
 class Analyzer():
     def __init__(self, language='python'):
@@ -108,11 +134,13 @@ class Analyzer():
         with open(filename, 'r') as in_file:
             trask_comment_str = ''
             trask_found = False
+            trask_found_at_line = 0
 
             for line_nb, line in enumerate(in_file):
 
                 (found, end_of_multi_comment) = self.process_file_line(line)
                 if(found):
+                    trask_found_at_line = line_nb+1
                     trask_found = True
 
                 if(self.multi_line_comment_started):
@@ -121,7 +149,7 @@ class Analyzer():
 
                 elif(end_of_multi_comment):
                     new_trask = Trask()
-                    new_trask.construct_from_comment_str(trask_comment_str, file=filename, line=line_nb)
+                    new_trask.construct_from_comment_str(trask_comment_str, file=filename, line=trask_found_at_line)
                     trasks.append(new_trask)
                     trask_comment_str = ''
                     trask_found = False
@@ -135,7 +163,7 @@ class Analyzer():
                             trask_comment_str += temp
                         else:
                             new_trask = Trask()
-                            new_trask.construct_from_comment_str(trask_comment_str, file=filename, line=line_nb)
+                            new_trask.construct_from_comment_str(trask_comment_str, file=filename, line=trask_found_at_line)
                             trasks.append(new_trask)
                             trask_comment_str = ''
                             trask_found = False
@@ -143,14 +171,21 @@ class Analyzer():
         return trasks
 
 
-
 if __name__ == '__main__':
-    in_filename = 'sample_test_file.py'
+    import argparse
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-f', '--file', dest='filename', required=True, help="input file to analyse")
+
+    args = parser.parse_args()
 
     analyzer = Analyzer()
     
-    trasks = analyzer.inspect_file(in_filename)
+    trasks = analyzer.inspect_file(args.filename)
     print('Number trasks found: {}'.format(len(trasks)))
     for t in trasks:
         print('----------------------------')
         t.display()
+
+    # test type modification
+    trasks[0].modify_type('todo')

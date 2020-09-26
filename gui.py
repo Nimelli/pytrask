@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 
 from trasker import Trask, Analyzer
 import subprocess
+from flaskwebgui import FlaskUI
 
 class AppUX():
     def __init__(self):
@@ -49,10 +50,7 @@ USE_FLASKWEBGUI = False
 
 ux = AppUX()
 app = Flask(__name__)
-
-if(USE_FLASKWEBGUI):
-    from flaskwebgui import FlaskUI
-    ui = FlaskUI(app)
+ui = FlaskUI(app)
 
 # flask routing
 @app.route("/")
@@ -83,13 +81,22 @@ def background_locate():
     ux.on_locate_trask(filename, line_nb)
     return ("nothing")
 
-def main():
-    if(USE_FLASKWEBGUI):
+def main(embedded=False):
+    if(embedded):
         ui.run()
     else:
         app.run()
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-e', '--embedded', action='store_true', help="shows application in its own windows (versus flask web page)")
+
+    args = parser.parse_args()
+    if(args.embedded):
+        main(True)
+    else:
+        main(False)
 
 

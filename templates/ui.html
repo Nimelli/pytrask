@@ -26,8 +26,9 @@
           <div class="tile is-parent is-vertical">
             {%for trask in todo_trasks%}   
             <div class="tile is-child notification is-primary">
+              <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
-              <a href="#" id={{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
+              <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
             </div>
             {%endfor%}
           </div>
@@ -39,7 +40,7 @@
 
           <div class="tile is-parent is-vertical">
             {%for trask in doing_trasks%}   
-            <div class="tile is-child notification is-primary">
+            <div class="tile is-child notification is-info">
               <p>{{trask.description}}</p>
             </div>
             {%endfor%}
@@ -52,7 +53,7 @@
 
           <div class="tile is-parent is-vertical">
             {%for trask in done_trasks%}   
-            <div class="tile is-child notification is-primary">
+            <div class="tile is-child notification is-warning">
               <p>{{trask.description}}</p>
             </div>
             {%endfor%}
@@ -65,7 +66,7 @@
 
           <div class="tile is-parent is-vertical">
             {%for trask in other_trasks%}   
-            <div class="tile is-child notification is-primary">
+            <div class="tile is-child notification is-link">
               <p>{{trask.description}}</p>
             </div>
             {%endfor%}
@@ -101,7 +102,16 @@
 
           // generate callback (might be a more efficient/elegant way to achieve that)
           {%for trask in todo_trasks%}   
-            $('a#{{trask.single_id}}').bind('click', function() {
+            $('a#find_{{trask.single_id}}').bind('click', function() {
+              $.getJSON('/background_locate', {
+                file: "{{trask.in_file}}",
+                line: {{trask.at_line}}
+              }, function(data) {
+                //do nothing
+              });
+              return false;
+            });
+            $('button#rem_{{trask.single_id}}').bind('click', function() {
               $.getJSON('/background_locate', {
                 file: "{{trask.in_file}}",
                 line: {{trask.at_line}}

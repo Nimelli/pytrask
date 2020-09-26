@@ -16,10 +16,16 @@ def PrintNumber(N, Original, K, flag):
 
     """
     @trask
-    doing:  implement comment block integration
+    todo:  implement comment block integration
             because it is useful for multiline integration
     author: me
     """
+
+    # @trask
+    # done: that was done
+
+    # @trask
+    # workaround: workaround for XXX
       
     if (N <= 0): 
         if(flag==0): 
