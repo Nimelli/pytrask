@@ -23,13 +23,15 @@ class AppUX():
         else:
             print('unsupported file')
 
-
-    def get_trasks(self):
-        # add single id for each trasks
+    def generate_single_id(self):
         i = 0
         for t in self.all_trasks:
             t.single_id = "trask_id_"+str(i)
             i += 1
+
+    def get_trasks(self):
+        # add single id for each trasks
+        self.generate_single_id
         return self.all_trasks
 
     def clear_trasks(self):
@@ -39,10 +41,24 @@ class AppUX():
         print("refresh btn pressed !")
 
     def on_test_btn(self):
-        pass
+        print("test btn")
 
     def on_locate_trask(self, filename, line_nb):
         self.open_file_at_line(filename, line_nb)
+
+    def on_trask_moved(self, trask_id, source, dest):
+        if(dest == 'todo_container'):
+            new_type = 'todo'
+        elif(dest == 'doing_container'):
+            new_type = 'doing'
+        elif(dest == 'done_container'):
+            new_type = 'done'
+        elif(dest == 'other_container'):
+            new_type = 'other'
+        
+        """ for t in self.all_trasks:
+            if(t.single_id == trask_id):
+                t.modify_type(new_type) """
 
 
 # global
@@ -65,7 +81,7 @@ def index():
     done_trasks = [t for t in trasks if t.trask_type=='done']
     other_trasks = [t for t in trasks if (t.trask_type!='todo' and t.trask_type!='doing' and t.trask_type!='done')]
 
-    return render_template('ui.html', todo_trasks=todo_trasks, doing_trasks=doing_trasks, done_trasks=done_trasks, other_trasks=other_trasks)
+    return render_template('ui.html', all_trasks=trasks, todo_trasks=todo_trasks, doing_trasks=doing_trasks, done_trasks=done_trasks, other_trasks=other_trasks)
 
 #background process happening without any refreshing
 @app.route('/background_process_test')
@@ -79,6 +95,15 @@ def background_locate():
     line_nb = request.args.get('line', 0, type=int)
     print('locating {}:{}'.format(filename, line_nb))
     ux.on_locate_trask(filename, line_nb)
+    return ("nothing")
+
+@app.route('/trask_moved')
+def trask_moved():
+    trask_id = request.args.get('id', 0, type=str)
+    source = request.args.get('from', 0, type=str)
+    dest = request.args.get('dest', 0, type=str)
+    print('Trask {} moved from {} to {}'.format(trask_id, source, dest))
+    ux.on_trask_moved(trask_id, source, dest)
     return ("nothing")
 
 def main(embedded=False):

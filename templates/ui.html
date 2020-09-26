@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PyTrask</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
-
+    <style>
+      #drop_container {min-height: 150px;}
+    </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
   </head>
   <body>
@@ -20,12 +22,12 @@
 
       <div class="columns">
 
-        <div class="column has-background-info-light">
+        <div id="todo_container" class="column has-background-info-light">
           <h5 class="title is-5">To Do</h5>
 
-          <div class="tile is-parent is-vertical">
+          <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in todo_trasks%}   
-            <div class="tile is-child notification is-primary">
+            <div id={{trask.single_id}} class="tile is-child notification is-primary" draggable="true" ondragstart="drag(event)">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -35,39 +37,45 @@
 
         </div>
 
-        <div class="column has-background-info-light">
+        <div id="doing_container" class="column has-background-info-light"s>
           <h5 class="title is-5">Doing</h5>
 
-          <div class="tile is-parent is-vertical">
+          <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in doing_trasks%}   
-            <div class="tile is-child notification is-info">
+            <div id={{trask.single_id}} class="tile is-child notification is-info" draggable="true" ondragstart="drag(event)">
+              <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
+              <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
             </div>
             {%endfor%}
           </div>
 
         </div>
 
-        <div class="column has-background-info-light">
+        <div id="done_container" class="column has-background-info-light">
           <h5 class="title is-5">Done</h5>
 
-          <div class="tile is-parent is-vertical">
+          <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in done_trasks%}   
-            <div class="tile is-child notification is-warning">
+            <div id={{trask.single_id}} class="tile is-child notification is-warning" draggable="true" ondragstart="drag(event)">
+              <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
+              <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
             </div>
             {%endfor%}
           </div>
 
         </div>
 
-        <div class="column has-background-info-light">
+        <div id="other_container" class="column has-background-info-light">
           <h5 class="title is-5">Other</h5>
 
-          <div class="tile is-parent is-vertical">
+          <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in other_trasks%}   
-            <div class="tile is-child notification is-link">
+            <div id={{trask.single_id}} class="tile is-child notification is-link" draggable="true" ondragstart="drag(event)">
+              <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
+              <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
             </div>
             {%endfor%}
           </div>
@@ -88,7 +96,7 @@
   <script>
     $(document).ready(function() {
         // Call refresh page function after 3000 milliseconds (or 3 seconds).
-        setInterval('refreshPage()', 3000);
+        //setInterval('refreshPage()', 3000);
     });
 
     $(function() {
@@ -101,7 +109,7 @@
           });
 
           // generate callback (might be a more efficient/elegant way to achieve that)
-          {%for trask in todo_trasks%}   
+          {%for trask in all_trasks%}   
             $('a#find_{{trask.single_id}}').bind('click', function() {
               $.getJSON('/background_locate', {
                 file: "{{trask.in_file}}",
@@ -125,6 +133,38 @@
 
     function refreshPage() { 
         location.reload(); 
+    }
+
+    function allowDrop(ev) {
+      
+      if (ev.target.id == "drop_container") {
+        ev.preventDefault();
+      }
+      
+    }
+
+    function drag(ev) {
+      ev.dataTransfer.setData("trask_id", ev.target.id);
+      ev.dataTransfer.setData("from", ev.path[2].id);
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      var trask_id = ev.dataTransfer.getData("trask_id");
+      var source = ev.dataTransfer.getData("from");
+      var destination = ev.path[1].id
+
+      ev.target.appendChild(document.getElementById(trask_id));
+
+      console.log(trask_id, ': ', source, ' ---> ', destination)
+
+      $.getJSON('/trask_moved', {
+        id: trask_id,
+        from: source,
+        dest: destination
+      }, function(data) {
+        //do nothing
+      });
     }
 
 
