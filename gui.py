@@ -1,36 +1,66 @@
 from flask import Flask, render_template, request
-#from flaskwebgui import FlaskUI   # get the FlaskUI class
 
 from trasker import Trask, Analyzer
 import subprocess
 
+class AppUX():
+    def __init__(self):
+        self.python_analyzer = Analyzer(language='python')
+        self.all_trasks = []
+
+    def open_file_at_line(self, filename, line_nb):
+        arg = filename+':'+str(line_nb)
+        subprocess.Popen(["code.cmd", "--goto", arg]) # open file with vscode
+        # @trask
+        # todo: implement other text editor calls (notepad, sublime, etc)
+
+    def analyse_file(self, filename):
+        ext = filename.split('.')[-1]
+        if(ext == 'py'):
+            trasks =  self.python_analyzer.inspect_file(filename)
+            self.all_trasks.extend(trasks)
+        else:
+            print('unsupported file')
+
+
+    def get_trasks(self):
+        # add single id for each trasks
+        i = 0
+        for t in self.all_trasks:
+            t.single_id = "trask_id_"+str(i)
+            i += 1
+        return self.all_trasks
+
+    def clear_trasks(self):
+        self.all_trasks = []
+
+    def on_refresh_btn(self):
+        print("refresh btn pressed !")
+
+    def on_test_btn(self):
+        pass
+
+    def on_locate_trask(self, filename, line_nb):
+        self.open_file_at_line(filename, line_nb)
+
+
 # global
+USE_FLASKWEBGUI = False
+
+ux = AppUX()
 app = Flask(__name__)
-python_analyzer = Analyzer(language='python')
-#ui = FlaskUI(app)                 # feed the parameters
 
-# functions
-def on_refresh_btn():
-    print("refresh btn pressed !")
-
-def open_file_at_line(filename, line_nb):
-    arg = filename+':'+str(line_nb)
-    subprocess.Popen(["code.cmd", "--goto", arg]) # open file with vscode
-    # @trask
-    # todo: implement other text editor calls (notepad, sublime, etc)
-
-def on_test_btn():
-    pass
-
-def on_locate_trask(filename, line_nb):
-    open_file_at_line(filename, line_nb)
-
-
+if(USE_FLASKWEBGUI):
+    from flaskwebgui import FlaskUI
+    ui = FlaskUI(app)
 
 # flask routing
 @app.route("/")
 def index():
-    trasks = python_analyzer.inspect_file('sample_test_file.py')
+    ux.clear_trasks()
+    ux.analyse_file('sample_test_file.py')
+    #ux.analyse_file('sample_test_file.py')
+    trasks = ux.get_trasks()
 
     todo_trasks = [t for t in trasks if t.trask_type=='todo']
     doing_trasks = [t for t in trasks if t.trask_type=='doing']
@@ -42,7 +72,7 @@ def index():
 #background process happening without any refreshing
 @app.route('/background_process_test')
 def background_process_test():
-    on_test_btn()
+    ux.on_test_btn()
     return ("nothing")
 
 @app.route('/background_locate')
@@ -50,12 +80,14 @@ def background_locate():
     filename = request.args.get('file', 0, type=str)
     line_nb = request.args.get('line', 0, type=int)
     print('locating {}:{}'.format(filename, line_nb))
-    on_locate_trask(filename, line_nb)
+    ux.on_locate_trask(filename, line_nb)
     return ("nothing")
 
 def main():
-    #ui.run()                           # call the 'run' method
-    app.run()
+    if(USE_FLASKWEBGUI):
+        ui.run()
+    else:
+        app.run()
 
 if __name__ == "__main__":
     main()

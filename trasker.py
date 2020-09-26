@@ -140,13 +140,6 @@ class Analyzer():
                             trask_comment_str = ''
                             trask_found = False
 
-
-        # generate single id for all trasks
-        i = 0
-        for t in trasks:
-            t.single_id = "trask_id_"+str(i)
-            i += 1
-
         return trasks
 
 
