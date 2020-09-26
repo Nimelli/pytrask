@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PyTrask</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  </head>
+  <body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">
+        Trask
+      </h1>
+      <p class="subtitle">
+        A minimalist kanban task management app that lives <strong>within your code</strong>!
+      </p>    
+
+      <div class="columns">
+
+        <div class="column has-background-info-light">
+          <h5 class="title is-5">To Do</h5>
+
+          <div class="tile is-parent is-vertical">
+            {%for trask in todo_trasks%}   
+            <div class="tile is-child notification is-primary">
+              <p>{{trask.description}}</p>
+              <a href="#" id={{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
+            </div>
+            {%endfor%}
+          </div>
+
+        </div>
+
+        <div class="column has-background-info-light">
+          <h5 class="title is-5">Doing</h5>
+
+          <div class="tile is-parent is-vertical">
+            {%for trask in doing_trasks%}   
+            <div class="tile is-child notification is-primary">
+              <p>{{trask.description}}</p>
+            </div>
+            {%endfor%}
+          </div>
+
+        </div>
+
+        <div class="column has-background-info-light">
+          <h5 class="title is-5">Done</h5>
+
+          <div class="tile is-parent is-vertical">
+            {%for trask in done_trasks%}   
+            <div class="tile is-child notification is-primary">
+              <p>{{trask.description}}</p>
+            </div>
+            {%endfor%}
+          </div>
+
+        </div>
+
+        <div class="column has-background-info-light">
+          <h5 class="title is-5">Other</h5>
+
+          <div class="tile is-parent is-vertical">
+            {%for trask in other_trasks%}   
+            <div class="tile is-child notification is-primary">
+              <p>{{trask.description}}</p>
+            </div>
+            {%endfor%}
+          </div>
+
+        </div>
+
+      </div>
+
+      <a href="/" class="button is-dark">Refresh</a>
+      <a href="#" id=test class="button is-dark">Test</a>
+
+
+    </div>
+
+  </section>
+  </body>
+
+  <script>
+    $(document).ready(function() {
+        // Call refresh page function after 3000 milliseconds (or 3 seconds).
+        setInterval('refreshPage()', 3000);
+    });
+
+    $(function() {
+          $('a#test').bind('click', function() {
+            $.getJSON('/background_process_test',
+                function(data) {
+              //do nothing
+            });
+            return false;
+          });
+
+          // generate callback (might be a more efficient/elegant way to achieve that)
+          {%for trask in todo_trasks%}   
+            $('a#{{trask.single_id}}').bind('click', function() {
+              $.getJSON('/background_locate', {
+                file: "{{trask.in_file}}",
+                line: {{trask.at_line}}
+              }, function(data) {
+                //do nothing
+              });
+              return false;
+            });
+          {%endfor%}
+        });
+
+    function refreshPage() { 
+        location.reload(); 
+    }
+
+
+  </script>
+
+</html>
