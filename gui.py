@@ -16,6 +16,8 @@ def on_refresh_btn():
 def open_file_at_line(filename, line_nb):
     arg = filename+':'+str(line_nb)
     subprocess.Popen(["code.cmd", "--goto", arg]) # open file with vscode
+    # @trask
+    # todo: implement other text editor calls (notepad, sublime, etc)
 
 def on_test_btn():
     pass

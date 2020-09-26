@@ -11,8 +11,15 @@ def PrintNumber(N, Original, K, flag):
     # become negative 
 
     # @trask
-    # todo: a test todo trask
+    # todo: a test todo trask (one line description)
     # author: me
+
+    """
+    @trask
+    doing:  implement comment block integration
+            because it is useful for multiline integration
+    author: me
+    """
       
     if (N <= 0): 
         if(flag==0): 
