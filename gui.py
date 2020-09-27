@@ -4,14 +4,43 @@ from trasker import Trask, Analyzer
 import subprocess
 from flaskwebgui import FlaskUI
 
+supported_editor = {
+    'vscode':{
+        'app': "code.cmd",
+        'cmd': "--goto",
+        'arg': "{filename}:{line_nb}"
+    },
+    'sublime':{
+        'app': "subl",
+        'cmd': "",
+        'arg': "{filename}:{line_nb}"
+    },
+}
+
 class AppUX():
     def __init__(self):
         self.python_analyzer = Analyzer(language='python')
         self.all_trasks = []
+        self.text_editor = 'vscode' #by default
+
+    def set_editor(self, editor):
+        if editor in list(supported_editor.keys()):
+            self.text_editor = editor
 
     def open_file_at_line(self, filename, line_nb):
-        arg = filename+':'+str(line_nb)
-        subprocess.Popen(["code.cmd", "--goto", arg]) # open file with vscode
+
+        app = supported_editor[self.text_editor]['app']
+        cmd = supported_editor[self.text_editor]['cmd']
+        arg = supported_editor[self.text_editor]['arg']
+
+        subprocess.Popen([app, cmd, arg.format(filename=filename, line_nb=line_nb)]) # open file with vscode
+
+        """ if(self.text_editor == 'vscode'):
+            arg = filename+':'+str(line_nb)
+            subprocess.Popen(["code.cmd", "--goto", arg]) # open file with vscode
+        elif(self.text_editor == 'sublime'):
+            arg = filename+':'+str(line_nb)
+            subprocess.Popen(["subl", arg]) # open file with vscode """
         # @trask
         # todo: implement other text editor calls (notepad, sublime, etc)
 
@@ -106,7 +135,8 @@ def trask_moved():
     ux.on_trask_moved(trask_id, source, dest)
     return ("nothing")
 
-def main(embedded=False):
+def main(embedded=False, editor='vscode'): 
+    ux.set_editor(editor)
     if(embedded):
         ui.run()
     else:
@@ -117,11 +147,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-e', '--embedded', action='store_true', help="shows application in its own windows (versus flask web page)")
+    parser.add_argument('-t', '--text-editor', dest='editor', help="Choice your editor between {}".format(list(supported_editor.keys())))
 
     args = parser.parse_args()
     if(args.embedded):
-        main(True)
+        main(True, args.editor)
     else:
-        main(False)
+        main(False, args.editor)
 
 
