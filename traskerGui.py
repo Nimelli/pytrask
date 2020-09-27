@@ -35,8 +35,13 @@ class AppUX():
         cmd = supported_editor[self.text_editor]['cmd']
         arg = supported_editor[self.text_editor]['arg']
 
-        subprocess.Popen([app, cmd, arg.format(filename=filename, line_nb=line_nb)]) # open file with vscode
-
+        try:
+            subprocess.Popen([app, cmd, arg.format(filename=filename, line_nb=line_nb)]) # open file with vscode
+        except:
+            print("Couldn't open the file. Current supported platform is Windows with the following backend editor: {}".format(list(supported_editor.keys())))
+            # @trask
+            # todo: add support for more text editor, and more platform (MAC, Linux)
+    
     def on_refresh_btn(self):
         print("refresh btn pressed !")
 
@@ -119,7 +124,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-e', '--embedded', action='store_true', help="shows application in its own windows (versus flask web page)")
-    parser.add_argument('-t', '--text-editor', dest='editor', help="Choice your editor between {}".format(list(supported_editor.keys())))
+    parser.add_argument('-t', '--text-editor', dest='editor', help="Choose your editor between {}".format(list(supported_editor.keys())))
     parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
     parser.add_argument('-d', '--dir', dest='directory', help="Add path of directory to analyse")
     parser.add_argument('-r', '--rec', action='store_true', help="Make directory (-d) analisys recursive")
