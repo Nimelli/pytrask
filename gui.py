@@ -23,6 +23,7 @@ supported_editor = {
 class AppUX():
     def __init__(self):
         self.text_editor = 'vscode' #by default
+        self.all_trasks = []
 
     def set_editor(self, editor):
         if editor in list(supported_editor.keys()):
@@ -35,15 +36,6 @@ class AppUX():
         arg = supported_editor[self.text_editor]['arg']
 
         subprocess.Popen([app, cmd, arg.format(filename=filename, line_nb=line_nb)]) # open file with vscode
-
-        """ if(self.text_editor == 'vscode'):
-            arg = filename+':'+str(line_nb)
-            subprocess.Popen(["code.cmd", "--goto", arg]) # open file with vscode
-        elif(self.text_editor == 'sublime'):
-            arg = filename+':'+str(line_nb)
-            subprocess.Popen(["subl", arg]) # open file with vscode """
-        # @trask
-        # todo: implement other text editor calls (notepad, sublime, etc)
 
     def on_refresh_btn(self):
         print("refresh btn pressed !")
@@ -83,6 +75,7 @@ def index():
     trasker.clear_trasks()
     trasker.analyse_all_files()
     trasks = trasker.get_trasks()
+    ux.all_trasks = trasks
 
     todo_trasks = [t for t in trasks if t.trask_type=='todo']
     doing_trasks = [t for t in trasks if t.trask_type=='doing']
@@ -128,12 +121,17 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--embedded', action='store_true', help="shows application in its own windows (versus flask web page)")
     parser.add_argument('-t', '--text-editor', dest='editor', help="Choice your editor between {}".format(list(supported_editor.keys())))
     parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
+    parser.add_argument('-d', '--dir', dest='directory', help="Add path of directory to analyse")
+    parser.add_argument('-r', '--rec', action='store_true', help="Make directory (-d) analisys recursive")
 
     args = parser.parse_args()
 
     if(args.files != None):
         for file in args.files:
             trasker.register_file(file)
+
+    if(args.directory != None):
+        trasker.register_directory(args.directory, recursive=args.rec)
 
     if(args.embedded):
         main(True, args.editor)

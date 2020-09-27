@@ -16,6 +16,10 @@ supported_languages = {
 }
 
 class Trask():
+    """"
+    Trask Class:
+    Define a Trask entity
+    """
     def __init__(self, trask_type='None', author='', description=''):
         self.trask_type = trask_type
         self.author = author
@@ -50,6 +54,10 @@ class Trask():
 
                 elif('workaround:' in word):
                     self.trask_type = 'workaround'
+                    add_next_to = 'description'
+
+                elif('other:' in word):
+                    self.trask_type = 'other'
                     add_next_to = 'description'
 
                 elif('author:' in word):
@@ -105,6 +113,10 @@ class Trask():
 
 
 class Analyzer():
+    """"
+    Analyzer Class:
+    Object used to analyse a given file to retrieve its trasks
+    """
     def __init__(self, language):
         self.supported_languages = supported_languages
         
@@ -139,7 +151,14 @@ class Analyzer():
             end_of_multi_comment = True
 
         if('@trask' in line):
-            found = True
+            # check if line is in a comment
+            if(self.multi_line_comment_started):
+                found = True
+            elif(self.single_line_comment_char in line):
+                found = True
+            else:
+                # not in a comment
+                found = False
         else:
             found = False
             
@@ -154,7 +173,7 @@ class Analyzer():
         with open(filename, 'r') as in_file:
             trask_comment_str = ''
             trask_found = False
-            trask_found_at_line = 0
+            trask_found_at_line = None
 
             for line_nb, line in enumerate(in_file):
 
@@ -167,7 +186,7 @@ class Analyzer():
                     # multi line comment analysis
                     trask_comment_str += line
 
-                elif(end_of_multi_comment):
+                elif(trask_found and end_of_multi_comment):
                     trask_comment_str += line
                     new_trask = Trask()
                     new_trask.construct_from_comment_str(trask_comment_str, file=filename, line=trask_found_at_line)
@@ -192,6 +211,10 @@ class Analyzer():
         return trasks
 
 class Trasker():
+    """"
+    Trasker Class:
+    High-level object used to register files to be processed and to retreive all trasks.
+    """
     def __init__(self):
         self.registered_files = []
         self.all_trasks = []
@@ -204,6 +227,19 @@ class Trasker():
             self.registered_files.append(filename)
         else:
             print("{} not found".format(filename))
+
+    def register_directory(self, directory, recursive=False):
+        dir_path = Path(directory)
+        if(dir_path.is_dir()):
+            if(recursive):
+                pathlist = Path(directory).glob('**/*.*')
+            else:
+                pathlist = Path(directory).glob('*.*')
+
+            for path in pathlist:
+                self.register_file(str(path))
+        else:
+            print("{} is not a valid directory path".format(directory))
 
     def analyse_file(self, filename):
         ext = filename.split('.')[-1]
@@ -246,6 +282,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
+    parser.add_argument('-d', '--dir', dest='directory', help="Add path of directory to analyse")
+    parser.add_argument('-r', '--rec', action='store_true', help="Make directory (-d) analisys recursive")
 
     args = parser.parse_args()
 
@@ -254,6 +292,10 @@ if __name__ == '__main__':
     if(args.files != None):
         for file in args.files:
             trasker.register_file(file)
+
+    if(args.directory != None):
+        trasker.register_directory(args.directory, recursive=args.rec)
+
     trasker.analyse_all_files()
     trasks = trasker.get_trasks()
 
