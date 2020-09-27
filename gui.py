@@ -4,6 +4,8 @@ from trasker import Trask, Analyzer
 import subprocess
 from flaskwebgui import FlaskUI
 
+from pathlib import Path
+
 supported_editor = {
     'vscode':{
         'app': "code.cmd",
@@ -21,6 +23,8 @@ class AppUX():
     def __init__(self):
         self.python_analyzer = Analyzer(language='python')
         self.all_trasks = []
+        self.registered_files = []
+
         self.text_editor = 'vscode' #by default
 
     def set_editor(self, editor):
@@ -51,6 +55,19 @@ class AppUX():
             self.all_trasks.extend(trasks)
         else:
             print('unsupported file')
+
+    def register_file(self, filename):
+        file = Path(filename)
+        if(file.is_file()):
+            # file exists
+            self.registered_files.append(filename)
+        else:
+            print("{} not found".format(filename))
+
+    def analyse_all_files(self):
+        for file in self.registered_files:
+            self.analyse_file(file)
+
 
     def generate_single_id(self):
         i = 0
@@ -101,8 +118,7 @@ ui = FlaskUI(app)
 @app.route("/")
 def index():
     ux.clear_trasks()
-    ux.analyse_file('sample_test_file.py')
-    #ux.analyse_file('sample_test_file.py')
+    ux.analyse_all_files()
     trasks = ux.get_trasks()
 
     todo_trasks = [t for t in trasks if t.trask_type=='todo']
@@ -148,8 +164,14 @@ if __name__ == "__main__":
 
     parser.add_argument('-e', '--embedded', action='store_true', help="shows application in its own windows (versus flask web page)")
     parser.add_argument('-t', '--text-editor', dest='editor', help="Choice your editor between {}".format(list(supported_editor.keys())))
+    parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
 
     args = parser.parse_args()
+
+    if(args.files != None):
+        for file in args.files:
+            ux.register_file(file)
+
     if(args.embedded):
         main(True, args.editor)
     else:
