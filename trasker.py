@@ -1,3 +1,19 @@
+from pathlib import Path
+
+supported_languages = {
+    'python':{
+        'extension': ['py'],
+        'single_line_comment_char': '#',
+        'multi_line_comment_char_start': '"""',
+        'multi_line_comment_char_stop': '"""'       
+    },
+    'c':{
+        'extension': ['c', 'h'],
+        'single_line_comment_char': '//',
+        'multi_line_comment_char_start': '/*',
+        'multi_line_comment_char_stop': '*/'       
+    },    
+}
 
 class Trask():
     def __init__(self, trask_type='None', author='', description=''):
@@ -53,7 +69,7 @@ class Trask():
                     if(len(word) > 0):
                         self.tags.append(word)
 
-    def display(self):
+    def print(self):
         print('Trask in file {} @{}:'.format(self.in_file, self.at_line))
         print('Type: {}'.format(self.trask_type))
         print('author: {}'.format(self.author))
@@ -89,17 +105,20 @@ class Trask():
 
 
 class Analyzer():
-    def __init__(self, language='python'):
+    def __init__(self, language):
+        self.supported_languages = supported_languages
         
-        if(language == 'python'):
+        if(language in list(self.supported_languages.keys())):
             self.language = language
-            self.single_line_comment_char = '#'
-            self.multi_line_comment_char_start = '"""'
-            self.multi_line_comment_char_stop = '"""'
-            self.multi_line_comment_started = False
+            self.single_line_comment_char = self.supported_languages[language]['single_line_comment_char']
+            self.multi_line_comment_char_start = self.supported_languages[language]['multi_line_comment_char_start']
+            self.multi_line_comment_char_stop = self.supported_languages[language]['multi_line_comment_char_stop']
+            
         else:
             print('{} language not supported yet'.format(language))
             return ''
+
+        self.multi_line_comment_started = False
 
     def extract_comment_from_line(self, line):
         if self.single_line_comment_char in line:
@@ -149,6 +168,7 @@ class Analyzer():
                     trask_comment_str += line
 
                 elif(end_of_multi_comment):
+                    trask_comment_str += line
                     new_trask = Trask()
                     new_trask.construct_from_comment_str(trask_comment_str, file=filename, line=trask_found_at_line)
                     trasks.append(new_trask)
@@ -171,22 +191,73 @@ class Analyzer():
 
         return trasks
 
+class Trasker():
+    def __init__(self):
+        self.registered_files = []
+        self.all_trasks = []
+        self.supported_languages = supported_languages
+
+    def register_file(self, filename):
+        file = Path(filename)
+        if(file.is_file()):
+            # file exists
+            self.registered_files.append(filename)
+        else:
+            print("{} not found".format(filename))
+
+    def analyse_file(self, filename):
+        ext = filename.split('.')[-1]
+
+        file_language = None
+        for lang in self.supported_languages:
+            if(ext in self.supported_languages[lang]['extension']):
+                file_language = lang
+                break
+
+        if(file_language == None):
+            print('Unsupported language for {}'.format(filename))
+            return
+
+        analyzer = Analyzer(language=file_language)
+        trasks = analyzer.inspect_file(filename)
+        self.all_trasks.extend(trasks)
+
+    def analyse_all_files(self):
+        for file in self.registered_files:
+            self.analyse_file(file)
+
+    def generate_single_id(self):
+        i = 0
+        for t in self.all_trasks:
+            t.single_id = "trask_id_"+str(i)
+            i += 1
+
+    def get_trasks(self):
+        # add single id for each trasks
+        self.generate_single_id()
+        return self.all_trasks
+    
+    def clear_trasks(self):
+        self.all_trasks = []
+
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-f', '--file', dest='filename', required=True, help="input file to analyse")
+    parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
 
     args = parser.parse_args()
 
-    analyzer = Analyzer()
-    
-    trasks = analyzer.inspect_file(args.filename)
+    trasker = Trasker()
+
+    if(args.files != None):
+        for file in args.files:
+            trasker.register_file(file)
+    trasker.analyse_all_files()
+    trasks = trasker.get_trasks()
+
     print('Number trasks found: {}'.format(len(trasks)))
     for t in trasks:
         print('----------------------------')
-        t.display()
-
-    # test type modification
-    trasks[0].modify_type('todo')
+        t.print()
