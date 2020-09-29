@@ -84,16 +84,16 @@
 
       </div>
 
-      <a href="/" class="button is-dark">Refresh</a>
+      <a href="/" class="button is-light is-small">Refresh</a>
 
       <div>
-          <label for="cars">Which editor to open your tasks:</label>
+          <label for="cars">Select which editor for opening your tasks:</label>
           <select name="editor" id="editor">
             {% for e in editors %}
             <option value="{{e}}">{{e}}</option>
             {%endfor%}
           </select>
-          <a id="updateeditor" href="#" class="button is-dark">update editor</a>
+          <a id="updateeditor" href="#" class="button is-light is-small">update editor</a>
 
       </div>
 

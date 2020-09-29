@@ -35,12 +35,12 @@ tag: <tag1>, <tag2>, ..., <tagN>
 ```
 only the "type" and "description" is mandatory. The other fields are optional.
 
-A TODO task example in a python file:
+Example of a 'todo' task in a python file:
 ``` python
 
 """
 @trask
-todo: this is an exampe 'todo' trask.
+todo: this is an exampe 'todo' task.
       It will then be displayed in the 'todo' column on the kanban board
 author: optional.author@example.com
 """
@@ -51,7 +51,9 @@ def func(arg):
 
 ### Analyse and display the Kanban Board
 
-The traskerGui app lets you visualize the kanban board and manage your tasks.
+![Image of Yaktocat](screenshot.png)
+
+The pytraskgui app lets you visualize the kanban board and quickly jump into its location.
 Following features are implemented:
 - Visual kanban board interface. Retreive all your tasks in your code.
 - Drag & drop tasks to change its type (ex: from "todo" to "done"). It you be updated in your code automatically.
