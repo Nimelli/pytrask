@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 
 #from trasker import Trask, Analyzer
-from trasker import Trask, Trasker
+from pytrask import Trask, Trasker
 import subprocess
 from flaskwebgui import FlaskUI
 
@@ -90,10 +90,6 @@ def index():
     return render_template('ui.html', all_trasks=trasks, todo_trasks=todo_trasks, doing_trasks=doing_trasks, done_trasks=done_trasks, other_trasks=other_trasks)
 
 #background process happening without any refreshing
-@app.route('/background_process_test')
-def background_process_test():
-    ux.on_test_btn()
-    return ("nothing")
 
 @app.route('/background_locate')
 def background_locate():
@@ -124,10 +120,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-e', '--embedded', action='store_true', help="shows application in its own windows (versus flask web page)")
-    parser.add_argument('-t', '--text-editor', dest='editor', help="Choose your editor between {}".format(list(supported_editor.keys())))
+    parser.add_argument('-t', '--text-editor', dest='editor', help="Choose which editor will open your trasks: {}. Default is vscode".format(list(supported_editor.keys())))
     parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
     parser.add_argument('-d', '--dir', dest='directory', help="Add path of directory to analyse")
-    parser.add_argument('-r', '--rec', action='store_true', help="Make directory (-d) analisys recursive")
+    parser.add_argument('-r', '--recursive', action='store_true', help="Make directory (-d) analisys recursive")
 
     args = parser.parse_args()
 
@@ -136,7 +132,7 @@ if __name__ == "__main__":
             trasker.register_file(file)
 
     if(args.directory != None):
-        trasker.register_directory(args.directory, recursive=args.rec)
+        trasker.register_directory(args.directory, recursive=args.recursive)
 
     if(args.embedded):
         main(True, args.editor)

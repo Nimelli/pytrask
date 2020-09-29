@@ -1,8 +1,8 @@
-# Trask
+# pyTrask
 
 A minimalist kanban task management app that lives within your code.
 
-Easilly add "todo" and other type of tasks in your code, and the Trasker app will let you visualize a managing kanban board of them.
+Easilly add "todo" and other type of tasks in your code, and the pyTrasker app will let you visualize a managing kanban board of them.
 
 ## Description
 "trask is the combination of "task" & "track""
@@ -10,10 +10,15 @@ Easilly add "todo" and other type of tasks in your code, and the Trasker app wil
 The motivation behind this app was to have a serverless, lightweight kanban board that follows your code.
 Before being an application, trask is above all a coding phylosophy. Indeed, "a trask" is a specific notation, as a comment in your code, that is describing the type of task and other meaningfull information that will be visualize on a kanban board.
 
-Advantages are that it is
+Advantages are that it is (will be)
 - language agnostic
 - simple and straighforward to use
 - git and sharing friendly: trasks live in your code, they follows it
+
+> This started as a small "refreshing, unpretentious" project.
+> But, at the end of the day, it became a quite useful tool. 
+> 
+> It is, obiously, prone to improvements, especially optimization, and UI. Currently the GUI is done through flask (and flaskwebgui) and the rendered is done with simple html and few javascript. The latter could really benefits some improvements.
 
 
 ## Installation
@@ -21,7 +26,7 @@ Advantages are that it is
 ## Usage
 
 ### Add a Trask
-To add a "trask" simply add in your code, where you want it to be, a comment with the following format:
+To add a "trask", simply add in your code, where you want it to be, a comment with the following format:
 ```
 @trask
 <type>: <description>
@@ -53,17 +58,24 @@ Following features are implemented:
 - Open the file at the location of your task. (currently works for windows with sublime or vscode editor)
 
 ```
-python traskerGui.py --help
+python pytraskgui.py --help
 ```
 
 Analyse and visualize specific files
 ```
-python traskerGui.py -f <filename1> ... <filenameN>
+python pytraskgui.py -f <filename1> ... <filenameN>
 ```
 
 Analyse and visualize a specific folder (add -r for recursivity)
 ```
-python traskerGui.py -d <directory_path>
+python pytraskgui.py -d <directory_path>
 ```
+
+## Upcoming improvements
+
+- more languages analysis support
+- more text-editors support to open trasks through UI
+- linux & macOS support to open trasks through UI
+- UI improvements
 
 

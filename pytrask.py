@@ -283,7 +283,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
     parser.add_argument('-d', '--dir', dest='directory', help="Add path of directory to analyse")
-    parser.add_argument('-r', '--rec', action='store_true', help="Make directory (-d) analisys recursive")
+    parser.add_argument('-r', '--rec', action='store_true', help="Make directory (-d) analysis recursive")
 
     args = parser.parse_args()
 
@@ -300,6 +300,6 @@ if __name__ == '__main__':
     trasks = trasker.get_trasks()
 
     print('Number trasks found: {}'.format(len(trasks)))
-    for t in trasks:
-        print('----------------------------')
+    for idx, t in enumerate(trasks):
+        print('---------- TRASK {} ------------'.format(idx+1))
         t.print()
