@@ -48,7 +48,14 @@ class AppUX():
     def on_test_btn(self):
         print("test btn")
 
-    def on_locate_trask(self, filename, line_nb):
+    def on_locate_trask(self, trask_id):
+        filename = None
+        line_nb = 0
+        for t in self.all_trasks:
+            if(t.single_id == trask_id):
+                filename = t.in_file
+                line_nb = t.at_line
+                break
         self.open_file_at_line(filename, line_nb)
 
     def on_trask_moved(self, trask_id, source, dest):
@@ -64,6 +71,8 @@ class AppUX():
         for t in self.all_trasks:
             if(t.single_id == trask_id):
                 t.modify_type(new_type)
+
+        
 
 
 # global
@@ -87,16 +96,23 @@ def index():
     done_trasks = [t for t in trasks if t.trask_type=='done']
     other_trasks = [t for t in trasks if (t.trask_type!='todo' and t.trask_type!='doing' and t.trask_type!='done')]
 
-    return render_template('ui.html', all_trasks=trasks, todo_trasks=todo_trasks, doing_trasks=doing_trasks, done_trasks=done_trasks, other_trasks=other_trasks)
+    editors = list(supported_editor.keys())
+
+    return render_template('ui.html', all_trasks=trasks, todo_trasks=todo_trasks, doing_trasks=doing_trasks, done_trasks=done_trasks, other_trasks=other_trasks, editors=editors)
 
 #background process happening without any refreshing
+@app.route('/update_editor')
+def update_editor():
+    editor = request.args.get('editor', 0, type=str)
+    print('update editor: {}'.format(editor))
+    ux.set_editor(editor)
+    return ("nothing")
 
 @app.route('/background_locate')
 def background_locate():
-    filename = request.args.get('file', 0, type=str)
-    line_nb = request.args.get('line', 0, type=int)
-    print('locating {}:{}'.format(filename, line_nb))
-    ux.on_locate_trask(filename, line_nb)
+    trask_id = request.args.get('id', 0, type=str)
+    print('locating {}'.format(trask_id))
+    ux.on_locate_trask(trask_id)
     return ("nothing")
 
 @app.route('/trask_moved')

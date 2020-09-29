@@ -27,7 +27,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in todo_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-primary" draggable="true" ondragstart="drag(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-primary" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -86,6 +86,17 @@
 
       <a href="/" class="button is-dark">Refresh</a>
 
+      <div>
+          <label for="cars">Which editor to open your tasks:</label>
+          <select name="editor" id="editor">
+            {% for e in editors %}
+            <option value="{{e}}">{{e}}</option>
+            {%endfor%}
+          </select>
+          <a id="updateeditor" href="#" class="button is-dark">update editor</a>
+
+      </div>
+
     </div>
 
   </section>
@@ -98,20 +109,21 @@
     });
 
     $(function() {
-          $('a#test').bind('click', function() {
-            $.getJSON('/background_process_test',
-                function(data) {
-              //do nothing
-            });
-            return false;
+          $('a#updateeditor').bind('click', function() {
+            var selected_editor = $('#editor').children("option:selected").val();
+            $.getJSON('/update_editor', {
+                editor: selected_editor
+              }, function(data) {
+                //do nothing
+              });
+              return false;
           });
 
           // generate callback (might be a more efficient/elegant way to achieve that)
           {%for trask in all_trasks%}   
             $('a#find_{{trask.single_id}}').bind('click', function() {
               $.getJSON('/background_locate', {
-                file: "{{trask.in_file}}",
-                line: {{trask.at_line}}
+                id: "{{trask.single_id}}"
               }, function(data) {
                 //do nothing
               });
@@ -119,8 +131,7 @@
             });
             $('button#rem_{{trask.single_id}}').bind('click', function() {
               $.getJSON('/background_locate', {
-                file: "{{trask.in_file}}",
-                line: {{trask.at_line}}
+                id: "{{trask.single_id}}"
               }, function(data) {
                 //do nothing
               });
@@ -163,6 +174,17 @@
       }, function(data) {
         //do nothing
       });
+    }
+
+    function trask_double_click(ev) {
+      var trask_id = ev.path[1].id
+      
+      $.getJSON('/background_locate', {
+        id: trask_id
+      }, function(data) {
+        //do nothing
+      });
+
     }
 
 
