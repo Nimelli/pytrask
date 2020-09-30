@@ -27,7 +27,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in todo_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-primary" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-primary" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event, '{{trask.single_id}}')">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -42,7 +42,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in doing_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-info" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-info" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event, '{{trask.single_id}}')">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -57,7 +57,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in done_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-warning" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-warning" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event, '{{trask.single_id}}')">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -72,7 +72,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in other_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-link" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-link" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event, '{{trask.single_id}}')">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -87,7 +87,7 @@
       <a href="/" class="button is-light is-small">Refresh</a>
 
       <div>
-          <label for="cars">Select which editor for opening your tasks:</label>
+          <label for="editor">Select which editor for opening your tasks:</label>
           <select name="editor" id="editor">
             {% for e in editors %}
             <option value="{{e}}">{{e}}</option>
@@ -176,9 +176,7 @@
       });
     }
 
-    function trask_double_click(ev) {
-      var trask_id = ev.path[1].id
-      
+    function trask_double_click(ev, trask_id) {      
       $.getJSON('/background_locate', {
         id: trask_id
       }, function(data) {
