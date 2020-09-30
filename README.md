@@ -23,6 +23,8 @@ Advantages are that it is (will be)
 
 ## Installation
 
+pip install pytrask
+
 ## Usage
 
 ### Add a Trask
@@ -59,18 +61,24 @@ Following features are implemented:
 - Drag & drop tasks to change its type (ex: from "todo" to "done"). It you be updated in your code automatically.
 - Open the file at the location of your task. (currently works for windows with sublime or vscode editor)
 
+Default (analyse recursively current directory )
 ```
-python pytraskgui.py --help
+python -m pytrask 
+```
+
+List arguments
+```
+python -m pytrask --help
 ```
 
 Analyse and visualize specific files
 ```
-python pytraskgui.py -f <filename1> ... <filenameN>
+python -m pytrask -f <filename1> ... <filenameN>
 ```
 
-Analyse and visualize a specific folder (add -r for recursivity)
+Analyse and visualize a specific folder (add -nr if recursivity is undesirable)
 ```
-python pytraskgui.py -d <directory_path>
+python -m pytrask -d <directory_path>
 ```
 
 ## Upcoming improvements
