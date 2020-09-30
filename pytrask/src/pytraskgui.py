@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request
 
 #from trasker import Trask, Analyzer
-from pytrask import Trask, Trasker
+from pytrask.src.trasker import Trask, Trasker
+
+
 import subprocess
 from flaskwebgui import FlaskUI
 
@@ -138,7 +140,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--embedded', action='store_true', help="shows application in its own windows (versus flask web page)")
     parser.add_argument('-t', '--text-editor', dest='editor', help="Choose which editor will open your trasks: {}. Default is vscode".format(list(supported_editor.keys())))
     parser.add_argument('-f', '--files', dest='files', nargs='+', help="Add path of files to analyse")
-    parser.add_argument('-d', '--dir', dest='directory', help="Add path of directory to analyse")
+    parser.add_argument('-d', '--dir', dest='directory', default='.', help="Add path of directory to analyse")
     parser.add_argument('-r', '--recursive', action='store_true', help="Make directory (-d) analisys recursive")
 
     args = parser.parse_args()

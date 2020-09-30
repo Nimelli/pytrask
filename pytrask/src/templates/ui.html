@@ -42,7 +42,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in doing_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-info" draggable="true" ondragstart="drag(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-info" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -57,7 +57,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in done_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-warning" draggable="true" ondragstart="drag(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-warning" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
@@ -72,7 +72,7 @@
 
           <div id="drop_container" class="tile is-parent is-vertical" ondrop="drop(event)" ondragover="allowDrop(event)">
             {%for trask in other_trasks%}   
-            <div id={{trask.single_id}} class="tile is-child notification is-link" draggable="true" ondragstart="drag(event)">
+            <div id={{trask.single_id}} class="tile is-child notification is-link" draggable="true" ondragstart="drag(event)" ondblclick="trask_double_click(event)">
               <button class="delete" id=rem_{{trask.single_id}}></button>
               <p>{{trask.description}}</p>
               <a href="#" id=find_{{trask.single_id}}>{{trask.in_file}}@{{trask.at_line}}</a>
