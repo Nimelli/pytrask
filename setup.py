@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pytrask", # Replace with your own username
-    version="0.0.1",
+    version="0.0.4",
     author="Nimelli",
     author_email="",
     description="Minimalist Kanban task management tool",
@@ -19,4 +19,11 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    install_requires=[
+        'flask',
+        'flaskwebgui'
+    ],
+    package_data = {
+        'pytrask': ['templates/*']
+    }
 )

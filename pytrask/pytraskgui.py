@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 
 #from trasker import Trask, Analyzer
-from pytrask.src.trasker import Trask, Trasker
+from pytrask.trasker import Trask, Trasker
 
 
 import subprocess
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         for file in args.files:
             trasker.register_file(file)
 
-    if(args.directory != None):
+    elif(args.directory != None):
         recursive = not args.nonrecursive
         trasker.register_directory(args.directory, recursive=recursive)
 
